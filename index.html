@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Hub de Herramientas</title>
+  <title>DevStudio - Menú de Herramientas</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -34,7 +34,7 @@
     nav {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--border-color);
-      padding: 16px 24px;
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -42,7 +42,7 @@
 
     .logo {
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: var(--accent);
       letter-spacing: 0.5px;
     }
@@ -57,11 +57,11 @@
       background: transparent;
       color: var(--text-sub);
       border: 1px solid transparent;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       transition: all 0.2s ease;
     }
 
@@ -79,28 +79,99 @@
     /* Contenedor Principal */
     main {
       flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
+      padding: 40px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     /* Vistas / Secciones */
     .tab-content {
       display: none;
-      width: 100%;
-      max-width: 550px;
     }
 
     .tab-content.active {
       display: block;
     }
 
-    .container {
+    /* Rejilla para 4 tarjetas en horizontal */
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    /* Tarjetas del Menú */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .card-preview {
+      width: 100%;
+      height: 140px;
+      background-color: var(--bg-color);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 16px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      line-height: 1.4;
+      flex-grow: 1;
+    }
+
+    .card-btn {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .card-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Vista Interna del Código Morse */
+    .tool-container {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 28px;
+      max-width: 600px;
+      margin: 0 auto;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
@@ -126,8 +197,9 @@
       letter-spacing: 0.05em;
     }
 
-    textarea, input[type="text"] {
+    textarea {
       width: 100%;
+      height: 100px;
       background-color: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -136,14 +208,10 @@
       font-size: 1rem;
       outline: none;
       transition: border-color 0.2s;
-    }
-
-    textarea {
-      height: 100px;
       resize: vertical;
     }
 
-    textarea:focus, input:focus {
+    textarea:focus {
       border-color: var(--accent);
     }
 
@@ -193,6 +261,19 @@
     .section {
       margin-bottom: 20px;
     }
+
+    /* Adaptación para pantallas pequeñas */
+    @media (max-width: 1024px) {
+      .grid-menu {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid-menu {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -201,17 +282,43 @@
   <nav>
     <div class="logo">🛠️ DevStudio</div>
     <ul class="nav-links">
-      <li><button class="nav-btn active" onclick="switchTab('morse')">Código Morse</button></li>
-      <li><button class="nav-btn" onclick="switchTab('proyecto2')">Nuevo Proyecto</button></li>
+      <li><button id="btn-menu" class="nav-btn active" onclick="switchTab('menu')">Menú</button></li>
+      <li><button id="btn-morse" class="nav-btn" onclick="switchTab('morse')">Código Morse</button></li>
     </ul>
   </nav>
 
   <!-- Área Principal -->
   <main>
 
-    <!-- HERRAMIENTA 1: CÓDIGO MORSE -->
-    <div id="morse" class="tab-content active">
-      <div class="container">
+    <!-- SECCIÓN: MENÚ DE HERRAMIENTAS -->
+    <div id="menu" class="tab-content active">
+      <h1 style="margin-bottom: 8px;">Panel de Herramientas</h1>
+      <p style="color: var(--text-sub); margin-bottom: 24px;">Selecciona una utilidad para comenzar a trabajar.</p>
+
+      <div class="grid-menu">
+        
+        <!-- Tarjeta 1: Código Morse -->
+        <div class="card">
+          <div class="card-preview">
+            <!-- Representación visual minimalista de código morse -->
+            <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+              <circle cx="15" cy="20" r="6" fill="#38bdf8"/>
+              <rect x="30" y="15" width="24" height="10" rx="5" fill="#38bdf8"/>
+              <circle cx="63" cy="20" r="6" fill="#38bdf8"/>
+              <rect x="78" y="15" width="24" height="10" rx="5" fill="#38bdf8"/>
+            </svg>
+          </div>
+          <div class="card-title">Código Morse</div>
+          <div class="card-desc">Traductor de texto a código morse con reproducción de audio nativa.</div>
+          <button class="card-btn" onclick="switchTab('morse')">Código Morse</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECCIÓN: HERRAMIENTA CÓDIGO MORSE -->
+    <div id="morse" class="tab-content">
+      <div class="tool-container">
         <h1>Morse Studio</h1>
         <p class="description">Convierte texto a código Morse y reproduce su sonido en tiempo real.</p>
 
@@ -232,34 +339,16 @@
       </div>
     </div>
 
-    <!-- HERRAMIENTA 2: ESPACIO PARA TUS FUTUROS PROYECTOS -->
-    <div id="proyecto2" class="tab-content">
-      <div class="container">
-        <h1>Nueva Herramienta</h1>
-        <p class="description">Espacio listo para construir tu siguiente proyecto o utilidad web.</p>
-        
-        <div class="section">
-          <label>Ideas posibles:</label>
-          <p style="color: var(--text-sub); font-size: 0.95rem; line-height: 1.6;">
-            • Entrenador auditivo del Método Koch.<br>
-            • Generador de contraseñas seguras.<br>
-            • Temporizador Pomodoro o reloj.<br>
-            • Bloc de notas rápido.
-          </p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script>
-    // Sistema de navegación por pestañas (Menú)
+    // Sistema de navegación
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
 
       document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
+      document.getElementById('btn-' + tabId).classList.add('active');
     }
 
     // --- LÓGICA DE CÓDIGO MORSE ---
@@ -350,4 +439,3 @@
   </script>
 </body>
 </html>
-
