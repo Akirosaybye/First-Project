@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Morse Studio - Entrenador</title>
+  <title>Mi Hub de Herramientas</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -12,6 +12,7 @@
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --border-color: #334155;
+      --hover-color: #334155;
     }
 
     * {
@@ -25,10 +26,74 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Menú de Navegación */
+    nav {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 12px;
+      list-style: none;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--text-sub);
+      border: 1px solid transparent;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--hover-color);
+      color: var(--text-main);
+    }
+
+    .nav-btn.active {
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Contenedor Principal */
+    main {
+      flex: 1;
+      display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
+    }
+
+    /* Vistas / Secciones */
+    .tab-content {
+      display: none;
+      width: 100%;
+      max-width: 550px;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     .container {
@@ -36,8 +101,6 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 28px;
-      max-width: 550px;
-      width: 100%;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
@@ -63,21 +126,24 @@
       letter-spacing: 0.05em;
     }
 
-    textarea {
+    textarea, input[type="text"] {
       width: 100%;
-      height: 100px;
       background-color: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       color: var(--text-main);
       padding: 12px;
       font-size: 1rem;
-      resize: vertical;
       outline: none;
       transition: border-color 0.2s;
     }
 
-    textarea:focus {
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    textarea:focus, input:focus {
       border-color: var(--accent);
     }
 
@@ -101,7 +167,7 @@
       margin-top: 20px;
     }
 
-    button {
+    .action-btn {
       flex: 1;
       padding: 12px 18px;
       background-color: var(--accent);
@@ -114,11 +180,11 @@
       transition: opacity 0.2s;
     }
 
-    button:hover {
+    .action-btn:hover {
       opacity: 0.9;
     }
 
-    button:disabled {
+    .action-btn:disabled {
       background-color: var(--border-color);
       color: var(--text-sub);
       cursor: not-allowed;
@@ -131,27 +197,72 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>Morse Studio</h1>
-    <p class="description">Convierte texto a código Morse y reproduce su sonido en tiempo real.</p>
+  <!-- Menú de Navegación -->
+  <nav>
+    <div class="logo">🛠️ DevStudio</div>
+    <ul class="nav-links">
+      <li><button class="nav-btn active" onclick="switchTab('morse')">Código Morse</button></li>
+      <li><button class="nav-btn" onclick="switchTab('proyecto2')">Nuevo Proyecto</button></li>
+    </ul>
+  </nav>
 
-    <div class="section">
-      <label for="inputText">Texto de entrada</label>
-      <textarea id="inputText" placeholder="Escribe algo aquí..."></textarea>
+  <!-- Área Principal -->
+  <main>
+
+    <!-- HERRAMIENTA 1: CÓDIGO MORSE -->
+    <div id="morse" class="tab-content active">
+      <div class="container">
+        <h1>Morse Studio</h1>
+        <p class="description">Convierte texto a código Morse y reproduce su sonido en tiempo real.</p>
+
+        <div class="section">
+          <label for="inputText">Texto de entrada</label>
+          <textarea id="inputText" placeholder="Escribe algo aquí..."></textarea>
+        </div>
+
+        <div class="section">
+          <label>Resultado en Código Morse</label>
+          <div id="morseOutput" class="output-box">...</div>
+        </div>
+
+        <div class="controls">
+          <button id="playBtn" class="action-btn">▶ Reproducir Sonido</button>
+          <button id="stopBtn" class="action-btn" style="background-color: #ef4444; color: white;" disabled>■ Detener</button>
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-      <label>Resultado en Código Morse</label>
-      <div id="morseOutput" class="output-box">...</div>
+    <!-- HERRAMIENTA 2: ESPACIO PARA TUS FUTUROS PROYECTOS -->
+    <div id="proyecto2" class="tab-content">
+      <div class="container">
+        <h1>Nueva Herramienta</h1>
+        <p class="description">Espacio listo para construir tu siguiente proyecto o utilidad web.</p>
+        
+        <div class="section">
+          <label>Ideas posibles:</label>
+          <p style="color: var(--text-sub); font-size: 0.95rem; line-height: 1.6;">
+            • Entrenador auditivo del Método Koch.<br>
+            • Generador de contraseñas seguras.<br>
+            • Temporizador Pomodoro o reloj.<br>
+            • Bloc de notas rápido.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div class="controls">
-      <button id="playBtn">▶ Reproducir Sonido</button>
-      <button id="stopBtn" style="background-color: #ef4444; color: white;" disabled>■ Detener</button>
-    </div>
-  </div>
+  </main>
 
   <script>
+    // Sistema de navegación por pestañas (Menú)
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // --- LÓGICA DE CÓDIGO MORSE ---
     const morseCodeMap = {
       'A': '.-',    'B': '-...',  'C': '-.-.',  'D': '-..',   'E': '.',
       'F': '..-.',  'G': '--.',   'H': '....',  'I': '..',    'J': '.---',
@@ -172,14 +283,12 @@
     let isPlaying = false;
     let shouldStop = false;
 
-    // Traducción automática mientras escribes
     inputText.addEventListener('input', () => {
       const text = inputText.value.toUpperCase();
       const translated = text.split('').map(char => morseCodeMap[char] || char).join(' ');
       morseOutput.textContent = translated || '...';
     });
 
-    // Reproducción de sonido usando Web Audio API
     function playTone(duration, freq = 600) {
       return new Promise(resolve => {
         if (shouldStop) return resolve();
@@ -190,7 +299,7 @@
 
         osc.type = 'sine';
         osc.frequency.value = freq;
-        gain.gain.value = 0.1; // Volumen cómodo
+        gain.gain.value = 0.1;
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -198,7 +307,7 @@
         osc.start();
         setTimeout(() => {
           osc.stop();
-          setTimeout(resolve, 60); // Pausa entre símbolos
+          setTimeout(resolve, 60);
         }, duration);
       });
     }
@@ -212,7 +321,7 @@
       playBtn.disabled = true;
       stopBtn.disabled = false;
 
-      const dotDuration = 80; // Tiempo en ms para un punto (rápido)
+      const dotDuration = 80;
 
       for (let char of code) {
         if (shouldStop) break;
