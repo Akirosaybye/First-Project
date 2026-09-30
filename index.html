@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morse Studio - Entrenador</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 28px;
+      max-width: 550px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    p.description {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 12px;
+      font-size: 1rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .output-box {
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 80px;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 1.25rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-top: 8px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 18px;
+      background-color: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      background-color: var(--border-color);
+      color: var(--text-sub);
+      cursor: not-allowed;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Morse Studio</h1>
+    <p class="description">Convierte texto a código Morse y reproduce su sonido en tiempo real.</p>
+
+    <div class="section">
+      <label for="inputText">Texto de entrada</label>
+      <textarea id="inputText" placeholder="Escribe algo aquí..."></textarea>
+    </div>
+
+    <div class="section">
+      <label>Resultado en Código Morse</label>
+      <div id="morseOutput" class="output-box">...</div>
+    </div>
+
+    <div class="controls">
+      <button id="playBtn">▶ Reproducir Sonido</button>
+      <button id="stopBtn" style="background-color: #ef4444; color: white;" disabled>■ Detener</button>
+    </div>
+  </div>
+
+  <script>
+    const morseCodeMap = {
+      'A': '.-',    'B': '-...',  'C': '-.-.',  'D': '-..',   'E': '.',
+      'F': '..-.',  'G': '--.',   'H': '....',  'I': '..',    'J': '.---',
+      'K': '-.-',   'L': '.-..',  'M': '--',    'N': '-.',    'O': '---',
+      'P': '.--.',  'Q': '--.-',  'R': '.-.',   'S': '...',   'T': '-',
+      'U': '..-',   'V': '...-',  'W': '.--',   'X': '-..-',  'Y': '-.--',
+      'Z': '--..',  '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+      '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+      '0': '-----', ' ': '/'
+    };
+
+    const inputText = document.getElementById('inputText');
+    const morseOutput = document.getElementById('morseOutput');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+
+    let audioCtx = null;
+    let isPlaying = false;
+    let shouldStop = false;
+
+    // Traducción automática mientras escribes
+    inputText.addEventListener('input', () => {
+      const text = inputText.value.toUpperCase();
+      const translated = text.split('').map(char => morseCodeMap[char] || char).join(' ');
+      morseOutput.textContent = translated || '...';
+    });
+
+    // Reproducción de sonido usando Web Audio API
+    function playTone(duration, freq = 600) {
+      return new Promise(resolve => {
+        if (shouldStop) return resolve();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = 0.1; // Volumen cómodo
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        setTimeout(() => {
+          osc.stop();
+          setTimeout(resolve, 60); // Pausa entre símbolos
+        }, duration);
+      });
+    }
+
+    async function playMorse() {
+      const code = morseOutput.textContent;
+      if (!code || code === '...') return;
+
+      isPlaying = true;
+      shouldStop = false;
+      playBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      const dotDuration = 80; // Tiempo en ms para un punto (rápido)
+
+      for (let char of code) {
+        if (shouldStop) break;
+        if (char === '.') {
+          await playTone(dotDuration);
+        } else if (char === '-') {
+          await playTone(dotDuration * 3);
+        } else if (char === ' ') {
+          await new Promise(r => setTimeout(r, dotDuration * 2));
+        } else if (char === '/') {
+          await new Promise(r => setTimeout(r, dotDuration * 5));
+        }
+      }
+
+      isPlaying = false;
+      playBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+
+    playBtn.addEventListener('click', playMorse);
+    stopBtn.addEventListener('click', () => {
+      shouldStop = true;
+      playBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
