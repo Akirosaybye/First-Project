@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alpha 0.01 - Menú de Herramientas</title>
+  <!-- Cargamos la librería Tesseract.js directamente desde CDN para el OCR sin costo -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -164,13 +166,13 @@
       opacity: 0.9;
     }
 
-    /* Vista Interna del Código Morse */
+    /* Vista de Herramientas */
     .tool-container {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 28px;
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
@@ -197,9 +199,8 @@
       letter-spacing: 0.05em;
     }
 
-    textarea {
+    textarea, input[type="file"] {
       width: 100%;
-      height: 100px;
       background-color: var(--bg-color);
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -208,6 +209,10 @@
       font-size: 1rem;
       outline: none;
       transition: border-color 0.2s;
+    }
+
+    textarea {
+      height: 120px;
       resize: vertical;
     }
 
@@ -262,7 +267,7 @@
       margin-bottom: 20px;
     }
 
-    /* Adaptación para pantallas pequeñas */
+    /* Adaptación móvil */
     @media (max-width: 1024px) {
       .grid-menu {
         grid-template-columns: repeat(2, 1fr);
@@ -284,13 +289,14 @@
     <ul class="nav-links">
       <li><button id="btn-menu" class="nav-btn active" onclick="switchTab('menu')">Menú</button></li>
       <li><button id="btn-morse" class="nav-btn" onclick="switchTab('morse')">Código Morse</button></li>
+      <li><button id="btn-ocr" class="nav-btn" onclick="switchTab('ocr')">PDF / OCR</button></li>
     </ul>
   </nav>
 
   <!-- Área Principal -->
   <main>
 
-    <!-- SECCIÓN: MENÚ DE HERRAMIENTAS -->
+    <!-- VISTA: MENÚ PRINCIPAL -->
     <div id="menu" class="tab-content active">
       <h1 style="margin-bottom: 8px;">Panel de Herramientas</h1>
       <p style="color: var(--text-sub); margin-bottom: 24px;">Selecciona una utilidad para comenzar a trabajar.</p>
@@ -300,7 +306,6 @@
         <!-- Tarjeta 1: Código Morse -->
         <div class="card">
           <div class="card-preview">
-            <!-- Representación visual minimalista de código morse -->
             <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
               <circle cx="15" cy="20" r="6" fill="#38bdf8"/>
               <rect x="30" y="15" width="24" height="10" rx="5" fill="#38bdf8"/>
@@ -313,10 +318,24 @@
           <button class="card-btn" onclick="switchTab('morse')">Código Morse</button>
         </div>
 
+        <!-- Tarjeta 2: PDF & OCR -->
+        <div class="card">
+          <div class="card-preview">
+            <svg width="100" height="40" viewBox="0 0 100 40" fill="none">
+              <rect x="20" y="5" width="60" height="30" rx="4" stroke="#38bdf8" stroke-width="2"/>
+              <line x1="30" y1="15" x2="70" y2="15" stroke="#38bdf8" stroke-width="2"/>
+              <line x1="30" y1="22" x2="55" y2="22" stroke="#38bdf8" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="card-title">Editor PDF / OCR</div>
+          <div class="card-desc">Extrae texto automático de imágenes y documentos PDF escaneados.</div>
+          <button class="card-btn" onclick="switchTab('ocr')">Editor PDF / OCR</button>
+        </div>
+
       </div>
     </div>
 
-    <!-- SECCIÓN: HERRAMIENTA CÓDIGO MORSE -->
+    <!-- VISTA: CÓDIGO MORSE -->
     <div id="morse" class="tab-content">
       <div class="tool-container">
         <h1>Morse Studio</h1>
@@ -339,10 +358,32 @@
       </div>
     </div>
 
+    <!-- VISTA: HERRAMIENTA PDF / OCR -->
+    <div id="ocr" class="tab-content">
+      <div class="tool-container">
+        <h1>Lector OCR & PDF</h1>
+        <p class="description">Sube una imagen o documento para extraer y copiar su texto automáticamente.</p>
+
+        <div class="section">
+          <label for="imageInput">Seleccionar Archivo (Imagen o PDF escaneado)</label>
+          <input type="file" id="imageInput" accept="image/*,.pdf">
+        </div>
+
+        <div class="controls">
+          <button id="ocrBtn" class="action-btn">🔍 Extraer Texto (OCR)</button>
+        </div>
+
+        <div class="section" style="margin-top: 24px;">
+          <label for="ocrOutput">Texto Extraído</label>
+          <textarea id="ocrOutput" placeholder="El texto reconocido aparecerá aquí..." readonly></textarea>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
-    // Sistema de navegación
+    // Sistema de navegación por pestañas
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -351,7 +392,7 @@
       document.getElementById('btn-' + tabId).classList.add('active');
     }
 
-    // --- LÓGICA DE CÓDIGO MORSE ---
+    // --- LÓGICA CÓDIGO MORSE ---
     const morseCodeMap = {
       'A': '.-',    'B': '-...',  'C': '-.-.',  'D': '-..',   'E': '.',
       'F': '..-.',  'G': '--.',   'H': '....',  'I': '..',    'J': '.---',
@@ -435,6 +476,34 @@
       shouldStop = true;
       playBtn.disabled = false;
       stopBtn.disabled = true;
+    });
+
+    // --- LÓGICA OCR ---
+    const imageInput = document.getElementById('imageInput');
+    const ocrBtn = document.getElementById('ocrBtn');
+    const ocrOutput = document.getElementById('ocrOutput');
+
+    ocrBtn.addEventListener('click', async () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        alert('Por favor, selecciona una imagen primero.');
+        return;
+      }
+
+      ocrOutput.value = 'Procesando archivo e identificando texto... Por favor espera.';
+      ocrBtn.disabled = true;
+
+      try {
+        const worker = await Tesseract.createWorker('spa');
+        const ret = await worker.recognize(file);
+        ocrOutput.value = ret.data.text || 'No se pudo detectar texto inteligible en la imagen.';
+        await worker.terminate();
+      } catch (err) {
+        ocrOutput.value = 'Error al procesar el archivo.';
+        console.error(err);
+      } finally {
+        ocrBtn.disabled = false;
+      }
     });
   </script>
 </body>
