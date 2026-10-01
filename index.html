@@ -7,9 +7,6 @@
   
   <!-- Estilos CSS vinculados -->
   <link rel="stylesheet" href="./styles.css">
-
-  <!-- Carga de librería externa Tesseract.js para el OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -19,7 +16,6 @@
     <ul class="nav-links">
       <li><button id="btn-menu" class="nav-btn active" onclick="switchTab('menu')">Menú</button></li>
       <li><button id="btn-morse" class="nav-btn" onclick="switchTab('morse')">Código Morse</button></li>
-      <li><button id="btn-ocr" class="nav-btn" onclick="switchTab('ocr')">PDF / OCR</button></li>
     </ul>
   </nav>
 
@@ -36,7 +32,7 @@
         </div>
         <h1 style="font-size: 1.8rem; color: #f8fafc; margin: 0;">Panel Modular de Utilidades</h1>
         <p style="color: #94a3b8; font-size: 0.95rem; margin: 0; max-width: 650px;">
-          Plataforma web multipropósito. Selecciona una herramienta del menú inferior para comenzar a traducir, procesar archivos o realizar tareas de desarrollo.
+          Plataforma web multipropósito. Selecciona una herramienta del menú inferior para comenzar.
         </p>
       </section>
 
@@ -58,18 +54,14 @@
           <button class="card-btn" onclick="switchTab('morse')">Abrir Código Morse</button>
         </div>
 
-        <!-- Tarjeta 2: PDF / OCR -->
-        <div class="card">
+        <!-- Tarjeta 2: Próximamente -->
+        <div class="card" style="opacity: 0.5;">
           <div class="card-preview">
-            <svg width="100" height="40" viewBox="0 0 100 40" fill="none">
-              <rect x="20" y="5" width="60" height="30" rx="4" stroke="#38bdf8" stroke-width="2"/>
-              <line x1="30" y1="15" x2="70" y2="15" stroke="#38bdf8" stroke-width="2"/>
-              <line x1="30" y1="22" x2="55" y2="22" stroke="#38bdf8" stroke-width="2"/>
-            </svg>
+            <span style="font-size: 1.5rem; color: #94a3b8;">➕</span>
           </div>
-          <div class="card-title">Editor PDF / OCR</div>
-          <div class="card-desc">Extrae texto óptico automáticamente desde imágenes o documentos escaneados.</div>
-          <button class="card-btn" onclick="switchTab('ocr')">Abrir PDF / OCR</button>
+          <div class="card-title">Herramienta 2</div>
+          <div class="card-desc">Espacio reservado para la siguiente utilidad de tu suite.</div>
+          <button class="card-btn" style="background-color: #334155; color: #94a3b8; cursor: not-allowed;" disabled>Disponible pronto</button>
         </div>
 
         <!-- Tarjeta 3: Próximamente -->
@@ -118,28 +110,6 @@
       </div>
     </div>
 
-    <!-- VISTA 3: HERRAMIENTA PDF / OCR -->
-    <div id="ocr" class="tab-content">
-      <div class="tool-container">
-        <h1>Lector OCR & PDF</h1>
-        <p class="description">Selecciona un archivo de imagen o documento escaneado para extraer su texto.</p>
-
-        <div class="section">
-          <label for="imageInput">Archivo de Entrada</label>
-          <input type="file" id="imageInput" accept="image/*,.pdf">
-        </div>
-
-        <div class="controls">
-          <button id="ocrBtn" class="action-btn">🔍 Extraer Texto (OCR)</button>
-        </div>
-
-        <div class="section" style="margin-top: 24px;">
-          <label for="ocrOutput">Texto Extraído</label>
-          <textarea id="ocrOutput" placeholder="El texto reconocido por la IA aparecerá aquí..." readonly></textarea>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <!-- Función interna para cambiar de pestaña -->
@@ -153,9 +123,8 @@
     }
   </script>
 
-  <!-- Scripts JavaScript vinculados de cada herramienta -->
+  <!-- Script del Código Morse -->
   <script src="morse.js"></script>
-  <script src="ocr.js"></script>
 
 </body>
 </html>
